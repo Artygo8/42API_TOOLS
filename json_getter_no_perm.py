@@ -48,9 +48,9 @@ def retrieve_txt(json_file_name, where, what, title=None, folder=None): # what m
         with open(BASEDIR + folder + '/' + file_name,"w+") as f:
             for i, main_content in enumerate(data[what[0]]):
                 if title:
-                    f.write(str(i) + ") " + main_content[title] + "\n\n")
+                    f.write("\n" + str(i) + ") " + main_content[title] + "\n")
                 f.write(main_content[what[1]] + "\n\n")
-    
+
 
 def retrieve_json(session, path):
 
