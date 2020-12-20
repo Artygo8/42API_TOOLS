@@ -3,11 +3,12 @@ from rauth import OAuth2Service
 from rauth import OAuth2Session
 
 def mkdir_p(folder):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    if folder:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
 def rm_f(path):
-    if os.path.exists(path):
+    if os.path.exists(path) and os.path.isfile(path):
         os.remove(path)
 
 
@@ -56,19 +57,34 @@ def retrieve_json(session, path):
 
         content = []
         for number in range( 0, 100 ) :
-            time.sleep(1)
+            
+            time.sleep(0.6) # please dont sleep less than 0.5 for the server limit
+
             web_page = session.get(f'https://api.intra.42.fr/v2/{path}?page[number]={number}', params={'format': 'json'})
-            print("Status code:", web_page.status_code)
+            
+            # Print the status once in a while
+            if number % 10 == 0:
+                print("Status code:", web_page.status_code)
+
             tmp = eval(str(web_page.json()))
             if tmp == []:
+                time.sleep(0.6)
                 break
+
             content.extend(tmp)
 
         json.dump(content, json_file, indent=4)
 
 
-def retrieve_data(json_file_name, what, content):
-    pass
+def retrieve_id(json_file_name, name, expected):
+        
+    with open(json_file_name) as json_file:
+        json_datas = json.load(json_file)
+
+    for data in json_datas:
+        if (data[name] == expected):
+            return (data["id"])
+
 
 
 class OAuth42:
@@ -99,7 +115,13 @@ class OAuth42:
         return self.session
 
 
-
+#      _             _   
+#  ___| |_ __ _ _ __| |_ 
+# / __| __/ _` | '__| __|
+# \__ \ || (_| | |  | |_ 
+# |___/\__\__,_|_|   \__|
+#                        
+# Infos about the usage of the API on https://api.intra.42.fr/apidoc
 
 
 # Before trying to retrieve anything :
@@ -107,5 +129,34 @@ connection = OAuth42()
 connection.access_token()
 session = connection.get_session()
 
-retrieve_json(session, "users/57131/scale_teams")
-retrieve_txt("users/57131/scale_teams.json", where=["team", "project_gitlab_path"], what=["questions_with_answers","guidelines"], title = "name")
+CAMPUS = "Paris"
+USER = "paszhang"
+
+
+# campus.json
+if not os.path.isfile(f"campus.json"):
+    retrieve_json(session, "campus")
+
+campus_id = retrieve_id("campus.json", "name", CAMPUS.title())
+print("campus_id is", campus_id)
+
+
+# campus/{campus_id}/users.json
+# For big campusses, you might be waiting for up to 3 minutes...
+if not os.path.isfile(f"campus/{campus_id}/users.json"):
+    retrieve_json(session, f"campus/{campus_id}/users")
+
+user_id = retrieve_id(f"campus/{campus_id}/users.json", "login", USER)
+print("user_id is", user_id)
+
+
+# users/{user_id}/scale_teams + retrieving evals
+if not os.path.isfile(f"users/{user_id}/scale_teams.json"):
+    retrieve_json(session, f"users/{user_id}/scale_teams")
+retrieve_txt(f"users/{user_id}/scale_teams.json", where=["team", "project_gitlab_path"], what=["questions_with_answers","guidelines"], title = "name")
+
+# Slots
+# if not os.path.isfile(f"projects/1401/slots"):
+# retrieve_json(session, f"projects/1401/slots")
+
+
