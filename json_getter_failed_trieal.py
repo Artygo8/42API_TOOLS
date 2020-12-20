@@ -1,4 +1,5 @@
 import json, os, time
+from time import sleep
 from rauth import OAuth2Service
 from rauth import OAuth2Session
 
@@ -36,6 +37,8 @@ def retrieve_txt(json_file_name, where, what, title=None): # what must be len=2 
         for i in range(len(where)):
             file_name = file_name[where[i]]
 
+        if not file_name:
+            continue
         # we take only the last part of this name. ex: folder = inner-circle, file = libft.txt
         folder, file_name = file_name.split('/')[-2:]
         file_name += "txt"
@@ -91,7 +94,7 @@ class OAuth42:
 
     def __init__(self):
         self.client_id = "4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd"
-        self.client_secret="61685f90ae7ec137cb916dd785cf3d7252dbfd13007d21ead5ff9c150d72f4d5"
+        self.client_secret = "61685f90ae7ec137cb916dd785cf3d7252dbfd13007d21ead5ff9c150d72f4d5"
         self.service = OAuth2Service(
             name="testing",
             client_id=self.client_id,
@@ -105,9 +108,29 @@ class OAuth42:
         self.token = None
 
     def access_token(self):
-        data = {'grant_type': self.grant_type, 'redirect_uri': 'http://127.0.0.1'}
+        data = {
+            'client_id': self.client_id,
+            'redirect_uri': 'http://google.com',
+            'response_type': 'code',
+            'scope': 'projects public',
+            'state': 'kqmapwixucbrf2'
+            }
+        url = self.service.get_authorize_url(**data)
+        print("\033[35m", url, "\033[m", sep='')
+        code = input(f"please follow the link above and copy paste the result after 'code=' from the searchbar:\n")
+        data = {
+            'code': code,
+            'scope': 'projects public',
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'grant_type': 'authorization_code',
+            'redirect_uri': 'http://google.com/',
+            'state': 'kqmapwixucbrf2'
+        }
+        print("result =", code)
 
-        self.token = self.service.get_auth_session(data=data, decoder=json.loads).access_token
+        self.token = self.service.get_access_token(data=data)
+        print("raw–token", self.token)
         return self.token
 
     def get_session(self):
@@ -129,8 +152,8 @@ connection = OAuth42()
 connection.access_token()
 session = connection.get_session()
 
-CAMPUS = "Paris"
-USER = "paszhang"
+CAMPUS = "Brussels"
+USER = "agossuin"
 
 
 # campus.json
@@ -156,7 +179,5 @@ if not os.path.isfile(f"users/{user_id}/scale_teams.json"):
 retrieve_txt(f"users/{user_id}/scale_teams.json", where=["team", "project_gitlab_path"], what=["questions_with_answers","guidelines"], title = "name")
 
 # Slots
-# if not os.path.isfile(f"projects/1401/slots"):
-# retrieve_json(session, f"projects/1401/slots")
-
-
+# if not os.path.isfile(f"projects/1342/slots"):
+retrieve_json(session, f"projects/1342/slots")
