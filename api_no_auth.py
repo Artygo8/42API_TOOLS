@@ -49,7 +49,7 @@ def retrieve_txt(json_file_name, where, what, title=None, folder=None): # what m
             for i, main_content in enumerate(data[what[0]]):
                 if title:
                     f.write("\n" + str(i) + ") " + main_content[title] + "\n")
-                f.write(main_content[what[1]] + "\n\n")
+                f.write(str(main_content[what[1]]) + "\n\n")
 
 
 def retrieve_json(session, path):
@@ -136,8 +136,8 @@ connection = OAuth42()
 connection.access_token()
 session = connection.get_session()
 
-CAMPUS = "Brussels"
-USER = "agossuin"
+CAMPUS = ""
+USER = ""
 
 if CAMPUS == "": CAMPUS = input("What is your campus? ")
 if USER == "": USER = input("What is your username? ")
@@ -165,10 +165,22 @@ if not os.path.isfile(f"users/{user_id}/scale_teams.json"):
     retrieve_json(session, f"users/{user_id}/scale_teams")
 folder = "evals/"
 retrieve_txt(f"users/{user_id}/scale_teams.json", where=["team", "project_gitlab_path"], what=["questions_with_answers","guidelines"], title = "name")
-print(f"Your retrieved files are in the folder {folder}/")
+print(f"Your retrieved files are in the folder {folder}")
 
 # retrieve vogsphere
 if not os.path.isfile(f"users/{user_id}/projects_users.json"):
     retrieve_json(session, f"users/{user_id}/projects_users")
 folder = "vogsphere/"
 retrieve_txt(f"users/{user_id}/projects_users.json", where=["teams", "project_gitlab_path"], what=["teams","repo_url"], folder = folder)
+print(f"Your retrieved files are in the folder {folder}")
+
+# retrieve ids
+folder = "ids/"
+retrieve_txt(f"users/{user_id}/projects_users.json", where=["teams", "project_gitlab_path"], what=["teams","project_id"], folder = folder)
+print(f"Your retrieved files are in the folder {folder}")
+
+#
+#
+# Obviously the ids and the vogsphere repositories would be of more use in a dictionary...
+#
+#

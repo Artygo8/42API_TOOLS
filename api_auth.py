@@ -52,7 +52,7 @@ class OAuth42:
             
                     sleep(0.6) # Please dont sleep less than 0.5 for the server limit
 
-                    response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
+                    response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}&filer=5', headers = {"Authorization": f"Bearer {self.access_token}"})
 
                     # Print the status once in a while
                     if page_number % 10 == 0:
@@ -72,6 +72,10 @@ class OAuth42:
 
 connection = OAuth42()
 connection.get_access_token()
+
+print("\033[33mRetrieve my teams\033[m")
+connection.get_json("me/teams")
+print("\033[33mFind slots\033[m")
 connection.get_json("projects/1342/slots")
 
 # Trying to take a slot
