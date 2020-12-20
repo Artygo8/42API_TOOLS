@@ -73,21 +73,18 @@ def retrieve_json(path):
     mkdir_p('/'.join(path.split('/')[:-1]))
     rm_f(path + ".json")
     with open(path + ".json", "a") as json_file:
-        json_file.write('[')
+        # json_file.write('[')
+        content = []
         for number in range( 0, 100 ) :
-            time.sleep(0.6)
-            sg = session.get(f'https://api.intra.42.fr/v2/{path}?page[number]={number}', params={'format': 'json'})
-            print("Status code: ", sg.status_code)
-            tmp = json.dumps(sg.json())[1:-1]
-            if tmp == "":
+            time.sleep(1)
+            web_page = session.get(f'https://api.intra.42.fr/v2/{path}?page[number]={number}', params={'format': 'json'})
+            print("Status code:", web_page.status_code)
+            tmp = eval(str(web_page.json()))
+            if tmp == []:
                 break
-            if number != 0:
-                json_file.write(',')
-            time.sleep(0.1) # to let time for writing.
-            json.dump(sg.json()[0], json_file, indent=4)
-        json_file.write(']')
+            content.extend(tmp)
 
-
+        json.dump(content, json_file, indent=4)
 
 retrieve_json("users/57131/scale_teams")
 retrieve_txt("users/57131/scale_teams.json", where=["team", "project_gitlab_path"], what=["questions_with_answers","guidelines"], title = "name")
