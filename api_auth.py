@@ -52,13 +52,14 @@ class OAuth42:
             
                     sleep(0.6) # Please dont sleep less than 0.5 for the server limit
 
-                    response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}&filer=5', headers = {"Authorization": f"Bearer {self.access_token}"})
+                    response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
                     # Print the status once in a while
                     if page_number % 10 == 0:
                         print("Status code:", response.status_code)
                         if response.status_code >= 400 :
                             print(response.text)
+                            rm_f(path + ".json")
                             return print("something went wrong...")
 
                     tmp = eval(str(response.json()))
@@ -73,10 +74,16 @@ class OAuth42:
 connection = OAuth42()
 connection.get_access_token()
 
-print("\033[33mRetrieve my teams\033[m")
-connection.get_json("me/teams")
+# print("\033[33mRetrieve my teams\033[m")
+# connection.get_json("me/teams")
 print("\033[33mFind slots\033[m")
-connection.get_json("projects/1342/slots")
+connection.get_json("projects/1348/slots")
 
-# Trying to take a slot
-# connection.get_json("slots/{slot_id}")
+
+
+while (1):
+    sleep(3)
+    slot_id = [40687789, 40681789, 40687785]
+    # Trying to take a slot
+    for i in slot_id:
+        connection.get_json(f"slots/{i}")
