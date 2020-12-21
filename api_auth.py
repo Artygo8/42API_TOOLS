@@ -1,4 +1,4 @@
-import json, os, requests
+import json, os, requests, datetime, wave
 from time import sleep
 
 def mkdir_p(folder):
@@ -44,7 +44,7 @@ class OAuth42:
             mkdir_p('/'.join(path.split('/')[:-1]))
             rm_f(path + ".json")
 
-            with open(path + ".json", "a") as json_file:
+            with open(path + ".json", "w") as json_file:
 
                 # In content, we add the data we retrieve.
                 content = []
@@ -54,13 +54,10 @@ class OAuth42:
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
-                    # Print the status once in a while
-                    if page_number % 10 == 0:
-                        print("Status code:", response.status_code)
-                        if response.status_code >= 400 :
-                            print(response.text)
-                            rm_f(path + ".json")
-                            return print("something went wrong...")
+                    if response.status_code >= 400 :
+                        print(response._content)
+                        rm_f(path + ".json")
+                        return print("something went wrong...")
 
                     tmp = eval(str(response.json()))
                     if tmp == []:
@@ -76,14 +73,30 @@ connection.get_access_token()
 
 # print("\033[33mRetrieve my teams\033[m")
 # connection.get_json("me/teams")
+
+
 print("\033[33mFind slots\033[m")
-connection.get_json("projects/1348/slots")
+# 1348 = CPP-04
+project_id = 1348
 
-
-
+discovered_slots = set()
 while (1):
-    sleep(3)
-    slot_id = [40687789, 40681789, 40687785]
-    # Trying to take a slot
-    for i in slot_id:
-        connection.get_json(f"slots/{i}")
+
+    connection.get_json(f"projects/{project_id}/slots")
+
+    with open(f"projects/{project_id}/slots.json") as json_slots :
+        data = json.load(json_slots)
+        for slot in data:
+            slot_id = slot["id"]
+            if slot_id in discovered_slots:
+                continue
+            discovered_slots.add(slot_id)
+
+            date = datetime.datetime.strptime(slot["begin_at"], '%Y-%m-%dT%H:%M:%S.000Z')
+            if date.day == date.today().day:
+                print(f"New slot for today {date.ctime()} discovered at {date.today().hour}h, {date.today().minute}min")
+                sleep(0.5)
+                response = requests.get(f'{connection.base_url}/slots/{slot_id}', headers = {"Authorization": f"Bearer {connection.access_token}"})
+                print(slot_id, response.status_code)
+                
+        sleep (10)
