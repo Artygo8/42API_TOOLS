@@ -79,6 +79,9 @@ class OAuth42:
         #                                              
 
         def get_access_token(self):
+            import vlc
+            p = vlc.MediaPlayer("notif.mp3")
+            p.play()
             print("https://api.intra.42.fr/oauth/authorize?client_id=4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd&redirect_uri=http%3A%2F%2Fgoogle.com&response_type=code&scope=public%20projects&state=a_very_long_random_string_witchmust_be_unguessable") # no state for now.
             if not self.code:
                 self.code = input("Paste the code from the url: ")
@@ -114,9 +117,11 @@ class OAuth42:
                     if page_number == 0:
                         print(response.status_code, end=",", flush=True)
 
-                    if response.status_code >= 400 :
+                    if response.status_code >= 400:
                         print(response.reason)
                         rm_f(path + ".json")
+                        if response.status_code == 401:
+                            self.get_access_token()
                         return print("something went wrong...")
 
                     tmp = eval(str(response.json()))
@@ -149,11 +154,9 @@ class OAuth42:
 
                 self.get_json_restricted(f"projects/{project_id}/slots")
 
-
                 # protection against file deletion that might be caused by server overload
                 if not os.path.isfile(f"projects/{project_id}/slots.json"):
                     continue
-                
 
                 with open(f"projects/{project_id}/slots.json") as json_slots :
                     data = json.load(json_slots)
@@ -165,7 +168,7 @@ class OAuth42:
 
                         date = datetime.datetime.strptime(slot["begin_at"], '%Y-%m-%dT%H:%M:%S.000Z')
                         # I think that when slots are created, their id is greater than the previous slots.
-                        if date.day == date.today().day and all(slot_id > ds for ds in discovered_slots):
+                        if date.day == date.today().day and all(slot_id > ds for ds in discovered_slots) and (date - datetime.datetime.now()).total_seconds() / 3600 > 0.5:
                             p = vlc.MediaPlayer("notif.mp3")
                             p.play()
                             newly_discovered_slots.add(slot_id)
