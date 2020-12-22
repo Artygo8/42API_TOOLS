@@ -168,7 +168,7 @@ class OAuth42:
                             p = vlc.MediaPlayer("notif.mp3")
                             p.play()
                             newly_discovered_slots.add(slot_id)
-                            print(f"New slot for today {date.ctime()} discovered at {date.today().hour}h{date.today().minute}")
+                            print(f"\nNew slot for today {date.ctime()} discovered at {date.today().hour}h{date.today().minute}", end=" ")
 
                     discovered_slots.update(newly_discovered_slots)
 
