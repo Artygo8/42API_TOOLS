@@ -105,7 +105,7 @@ class OAuth42:
 
                 # In content, we add the data we retrieve.
                 content = []
-                for page_number in range(0, 1000) :
+                for page_number in range(0, 20) :
             
                     sleep(1) # Please dont sleep less than 0.5 for the server limit, I use 1 so we can have more than one user at the time. + it shouldnt be more than 2 pages anyway
 
@@ -150,6 +150,8 @@ class OAuth42:
                 if not os.path.isfile(f"projects/{project_id}/slots.json"):
                     continue
                 
+                print("?",end="")
+
                 with open(f"projects/{project_id}/slots.json") as json_slots :
                     print("!",end="")
                     data = json.load(json_slots)
