@@ -54,7 +54,7 @@ class OAuth42:
 
                 # In content, we add the data we retrieve.
                 content = []
-                for page_number in range(0, 200) :
+                for page_number in range(0, 1000) :
             
                     sleep(0.6) # Please dont sleep less than 0.5 for the server limit
 
@@ -107,7 +107,7 @@ class OAuth42:
 
                 # In content, we add the data we retrieve.
                 content = []
-                for page_number in range(0, 200) :
+                for page_number in range(0, 1000) :
             
                     sleep(0.6) # Please dont sleep less than 0.5 for the server limit
 
@@ -156,7 +156,7 @@ class OAuth42:
                         if date.day == date.today().day:
                             print(f"New slot for today {date.ctime()} discovered at {date.today().hour}h, {date.today().minute}min")
                             sleep(0.5)
-                            response = requests.get(f'{self.base_url}/slots/{slot_id}', headers = {"Authorization": f"Bearer {self.access_token}"})
+                            response = requests.post(f'{self.base_url}/slots/{slot_id}', headers = {"Authorization": f"Bearer {self.access_token}"})
                             print(slot_id, response.status_code)
 
                     sleep (10)

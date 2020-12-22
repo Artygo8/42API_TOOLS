@@ -7,7 +7,7 @@ It is a set of tools to retrieve data directly through the api. The main part of
 ## Requierments
 
 ```bash
-python3 -m pip install gitpython # for the cursus cloner
+./install_dependencies.sh
 ```
 
 ## Tools
