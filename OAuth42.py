@@ -101,7 +101,7 @@ class OAuth42:
             mkdir_p('/'.join(path.split('/')[:-1]))
             rm_f(path + ".json")
 
-            with open(path + ".json", "w") as json_file:
+            with open(path + ".json", "w+") as json_file:
 
                 # In content, we add the data we retrieve.
                 content = []
@@ -110,6 +110,8 @@ class OAuth42:
                     sleep(1) # Please dont sleep less than 0.5 for the server limit, I use 1 so we can have more than one user at the time. + it shouldnt be more than 2 pages anyway
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
+
+                    print(response.status_code, end=",", flush=True)
 
                     if response.status_code >= 400 :
                         print(response.reason)
@@ -146,14 +148,13 @@ class OAuth42:
 
                 self.get_json_restricted(f"projects/{project_id}/slots")
 
+
                 # protection against file deletion that might be caused by server overload
                 if not os.path.isfile(f"projects/{project_id}/slots.json"):
                     continue
                 
-                print("?",end="")
 
                 with open(f"projects/{project_id}/slots.json") as json_slots :
-                    print("!",end="")
                     data = json.load(json_slots)
                     newly_discovered_slots = set()
                     for slot in data:
