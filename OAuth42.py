@@ -82,9 +82,8 @@ class OAuth42:
             import vlc
             p = vlc.MediaPlayer("notif.mp3")
             p.play()
-            print("https://api.intra.42.fr/oauth/authorize?client_id=4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd&redirect_uri=http%3A%2F%2Fgoogle.com&response_type=code&scope=public%20projects&state=a_very_long_random_string_witchmust_be_unguessable") # no state for now.
-            if not self.code:
-                self.code = input("Paste the code from the url: ")
+            print("https://api.intra.42.fr/oauth/authorize?client_id=4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd&redirect_uri=http%3A%2F%2Fgoogle.com&response_type=code&scope=public%20projects") # no state for now.
+            self.code = input("Paste the code from the url: ")
             post_data = {
                 'grant_type' : "authorization_code",
                 'client_id' : self.client_id,
@@ -114,8 +113,8 @@ class OAuth42:
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
-                    if page_number == 0:
-                        print(response.status_code, end=",", flush=True)
+                    # if page_number == 0:
+                    #     print(response.status_code, end=",", flush=True)
 
                     if response.status_code >= 400:
                         print(response.reason)
@@ -158,6 +157,7 @@ class OAuth42:
                 if not os.path.isfile(f"projects/{project_id}/slots.json"):
                     continue
 
+                print('.', end='', flush=True) # to show progress
                 with open(f"projects/{project_id}/slots.json") as json_slots :
                     data = json.load(json_slots)
                     newly_discovered_slots = set()
@@ -168,13 +168,13 @@ class OAuth42:
 
                         date = datetime.datetime.strptime(slot["begin_at"], '%Y-%m-%dT%H:%M:%S.000Z')
                         # I think that when slots are created, their id is greater than the previous slots.
-                        if date.day == date.today().day and all(slot_id > ds for ds in discovered_slots) and (date - datetime.datetime.now()).total_seconds() / 3600 > 0.5:
+                        if date.day in [date.today().day, date.today().day + 1] and all(slot_id > ds for ds in discovered_slots) and (date - datetime.datetime.now()).total_seconds() / 3600 > 0.5:
                             p = vlc.MediaPlayer("notif.mp3")
                             p.play()
                             newly_discovered_slots.add(slot_id)
-                            print(f"\nNew slot for today {date.ctime()} discovered at {date.today().hour}h{date.today().minute}", end=" ")
+                            print(f"\033[36m\rNew slot for {date.ctime()} discovered at {date.today().hour}h{date.today().minute:02}\033[m")
 
                     discovered_slots.update(newly_discovered_slots)
 
                 # sleep is random for multi users
-                sleep (random.randint(10, 20))
+                sleep (random.randint(30, 40))
