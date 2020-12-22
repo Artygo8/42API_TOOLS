@@ -152,12 +152,12 @@ class OAuth42:
 
                 with open(f"projects/{project_id}/slots.json") as json_slots :
                     data = json.load(json_slots)
+                    newly_discovered_slots = set()
                     for slot in data:
                         slot_id = slot["id"]
                         if slot_id in discovered_slots:
                             continue
 
-                        newly_discovered_slots = set()
                         date = datetime.datetime.strptime(slot["begin_at"], '%Y-%m-%dT%H:%M:%S.000Z')
                         # I think that when slots are created, their id is greater than the previous slots.
                         if date.day == date.today().day and all(slot_id > ds for ds in discovered_slots):
