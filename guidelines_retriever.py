@@ -6,7 +6,7 @@ connection = OAuth42()
 CAMPUS = ""
 USER = ""
 
-if CAMPUS == "": CAMPUS = input("What is your campus? ")
+if CAMPUS == "": CAMPUS = input("Where is your campus (brussels, paris, ...)? ")
 if USER == "": USER = input("What is your username? ")
 
 

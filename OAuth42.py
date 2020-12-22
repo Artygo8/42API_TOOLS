@@ -112,7 +112,7 @@ class OAuth42:
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
                     if response.status_code >= 400 :
-                        print(response._content)
+                        print(response.reason)
                         rm_f(path + ".json")
                         return print("something went wrong...")
 
@@ -169,4 +169,4 @@ class OAuth42:
                     discovered_slots.update(newly_discovered_slots)
 
                 # sleep is random for multi users
-                sleep (random.randint(20, 50))
+                sleep (random.randint(20, 30))
