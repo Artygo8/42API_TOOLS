@@ -19,4 +19,4 @@ To use the tools, simply launch them one by one with python3.
 
  - [x] guidelines_retriever.py - retrieve all the guidelines (evaluation page) from the projects of a given user.
 
- - [ ] find_slots.py - Well... it does find slots, but that's about all... this one is a failure. 
+ - [x] find_slots.py - Well... Maybe not so bad after all, get notified when someone puts slots (you need your project_id).

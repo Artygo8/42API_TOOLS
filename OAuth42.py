@@ -10,8 +10,6 @@ def rm_f(path):
     if os.path.exists(path) and os.path.isfile(path):
         os.remove(path)
 
-#
-# 
 
 class OAuth42:
 
@@ -109,7 +107,7 @@ class OAuth42:
                 content = []
                 for page_number in range(0, 1000) :
             
-                    sleep(0.6) # Please dont sleep less than 0.5 for the server limit
+                    sleep(1) # Please dont sleep less than 0.5 for the server limit, I use 1 so we can have more than one user at the time. + it shouldnt be more than 2 pages anyway
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
@@ -135,6 +133,10 @@ class OAuth42:
 
         # I find the slots but still can't book them.
         def find_slots(self, project_id):
+            import vlc
+            import random
+
+            print("\033[33mBe aware that this script will not work well the first 5 minutes, it needs to build up some data first.\033[m")
 
             if not self.access_token:
                 self.get_access_token()
@@ -144,20 +146,27 @@ class OAuth42:
 
                 self.get_json_restricted(f"projects/{project_id}/slots")
 
+                # protection against file deletion that might be caused by server overload
+                if not os.path.isfile(f"projects/{project_id}/slots.json"):
+                    continue
+
                 with open(f"projects/{project_id}/slots.json") as json_slots :
                     data = json.load(json_slots)
                     for slot in data:
                         slot_id = slot["id"]
                         if slot_id in discovered_slots:
                             continue
-                        discovered_slots.add(slot_id)
 
+                        newly_discovered_slots = set()
                         date = datetime.datetime.strptime(slot["begin_at"], '%Y-%m-%dT%H:%M:%S.000Z')
-                        if date.day == date.today().day:
-                            print(f"New slot for today {date.ctime()} discovered at {date.today().hour}h, {date.today().minute}min")
-                            sleep(0.5)
-                            response = requests.post(f'{self.base_url}/slots/{slot_id}', headers = {"Authorization": f"Bearer {self.access_token}"})
-                            print(slot_id, response.status_code)
+                        # I think that when slots are created, their id is greater than the previous slots.
+                        if date.day == date.today().day and all(slot_id > ds for ds in discovered_slots):
+                            p = vlc.MediaPlayer("notif.mp3")
+                            p.play()
+                            newly_discovered_slots.add(slot_id)
+                            print(f"New slot for today {date.ctime()} discovered at {date.today().hour}h{date.today().minute}")
 
-                    sleep (10)
+                    discovered_slots.update(newly_discovered_slots)
 
+                # sleep is random for multi users
+                sleep (random.randint(20, 50))
