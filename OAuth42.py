@@ -149,8 +149,9 @@ class OAuth42:
                 # protection against file deletion that might be caused by server overload
                 if not os.path.isfile(f"projects/{project_id}/slots.json"):
                     continue
-
+                
                 with open(f"projects/{project_id}/slots.json") as json_slots :
+                    print("!",end="")
                     data = json.load(json_slots)
                     newly_discovered_slots = set()
                     for slot in data:
@@ -169,4 +170,4 @@ class OAuth42:
                     discovered_slots.update(newly_discovered_slots)
 
                 # sleep is random for multi users
-                sleep (random.randint(20, 30))
+                sleep (random.randint(10, 20))
