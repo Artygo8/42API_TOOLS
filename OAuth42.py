@@ -111,7 +111,8 @@ class OAuth42:
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
-                    print(response.status_code, end=",", flush=True)
+                    if page_number == 0:
+                        print(response.status_code, end=",", flush=True)
 
                     if response.status_code >= 400 :
                         print(response.reason)
