@@ -1,6 +1,13 @@
 import json, os, requests
 from time import sleep
 
+#  _              _     
+# | |_ ___   ___ | |___ 
+# | __/ _ \ / _ \| / __|
+# | || (_) | (_) | \__ \
+#  \__\___/ \___/|_|___/
+#                       
+
 def mkdir_p(folder):
     if folder:
         if not os.path.exists(folder):
@@ -10,6 +17,12 @@ def rm_f(path):
     if os.path.exists(path) and os.path.isfile(path):
         os.remove(path)
 
+#   ___    _         _   _     _  _  ____  
+# /  _  \ / \  _   _| |_| |__ | || ||___  \ 
+# | | | |/ _ \| | | | __| '_ \| || |_ __) |
+# | |_| / ___ \ |_| | |_| | | |__   _/ __/ 
+# \____/_/   \_\__,_|\__|_| |_|  |_||_____|
+#                                          
 
 class OAuth42:
 
@@ -23,11 +36,11 @@ class OAuth42:
             self.access_token = None
             self.code = None
 
-        #  _               _      
-        # | |__   __ _ ___(_) ___ 
-        # | '_ \ / _` / __| |/ __|
-        # | |_) | (_| \__ \ | (__ 
-        # |_.__/ \__,_|___/_|\___|
+        #  ,               ,      
+        # | |,,   ,, , ,,,(,) ,,, 
+        # | ', \ / ,` / ,,| |/ ,,|
+        # | |,) | (,| \,, \ | (,, 
+        # |,.,,/ \,,,,|,,,/,|\,,,|
         #                         
 
         def get_basic_access(self):
@@ -36,33 +49,31 @@ class OAuth42:
                 'client_id' : self.client_id,
                 'client_secret' : self.client_secret,
             }
-            r = requests.post(self.access_token_url, data=post_data)
-            response = r.json()
-            self.public_token = response["access_token"]
+            response = requests.post(self.access_token_url, data=post_data)
+            json_response = response.json()
+            self.public_token = json_response["access_token"]
 
 
-        def get_json_basic(self, path):
+        def get_json_basic(self, path, max_nb_page=1000, basedir="./", show_status_code=False):
 
-            if not self.public_token:
-                self.get_basic_access()
+            if not self.public_token: self.get_basic_access()
 
+            path = basedir + path
             mkdir_p('/'.join(path.split('/')[:-1]))
             rm_f(path + ".json")
 
             with open(path + ".json", "w") as json_file:
 
-                # In content, we add the data we retrieve.
                 content = []
-                for page_number in range(0, 1000) :
+                for page_number in range(0, max_nb_page):
             
-                    sleep(0.6) # Please dont sleep less than 0.5 for the server limit
+                    sleep(0.6) # Please dont sleep less than 0.5 for the server limit.
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.public_token}"})
 
-                    if response.status_code >= 400 :
-                        print(response._content)
-                        rm_f(path + ".json")
-                        return print("something went wrong...")
+                    if response.status_code >= 400:
+                        print(f"something went wrong... {response.reason}")
+                        return 
 
                     tmp = eval(str(response.json()))
                     if tmp == []:
@@ -72,53 +83,51 @@ class OAuth42:
 
                 json.dump(content, json_file, indent=4)
 
-        #   __ _               
-        #  / _| | _____      __
-        # | |_| |/ _ \ \ /\ / /
-        # |  _| | (_) \ V  V / 
-        # |_| |_|\___/ \_/\_/  
-        #                      
+        #   ,, ,               
+        #  / ,| | ,,,,,      ,,
+        # | |,| |/ , \ \ /\ / /
+        # |  ,| | (,) \ V  V / 
+        # |,| |,|\,,,/ \,/\,/  
+                     
 
         def get_access_token(self):
-            import vlc
-            p = vlc.MediaPlayer("notif.mp3")
-            p.play()
+
+            def sound_notif():
+                import vlc
+                p = vlc.MediaPlayer("notif.mp3")
+                p.play()
+
+            sound_notif()
             print("https://api.intra.42.fr/oauth/authorize?client_id=4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd&redirect_uri=http%3A%2F%2Fgoogle.com&response_type=code&scope=public%20projects") # no state for now.
             self.code = input("Paste the code from the url: ")
             post_data = {'grant_type' : "authorization_code",'client_id' : self.client_id,'client_secret' : self.client_secret,'code' : self.code,'redirect_uri' : "http://google.com"}
-            r = requests.post(self.access_token_url, data=post_data)
-            response = r.json()
-            self.access_token = response["access_token"]
+            response = requests.post(self.access_token_url, data=post_data)
+            json_response = response.json()
+            self.access_token = json_response["access_token"]
+            return self.access_token
 
+        def get_json_restricted(self, path, max_nb_page=1000, basedir="./", show_status_code=False):
 
-        def get_json_restricted(self, path):
-
-            if not self.access_token:
-                self.get_access_token()
-
+            path = basedir + path
             mkdir_p('/'.join(path.split('/')[:-1]))
             rm_f(path + ".json")
 
             with open(path + ".json", "w+") as json_file:
 
-                # In content, we add the data we retrieve.
                 content = []
-                for page_number in range(0, 20) :
+                for page_number in range(0, max_nb_page) :
             
                     sleep(1) # Please dont sleep less than 0.5 for the server limit, I use 1 so we can have more than one user at the time. + it shouldnt be more than 2 pages anyway
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
 
-                    # if page_number == 0:
-                    #     print(response.status_code, end=",", flush=True)
+                    if show_status_code: print("status:", response.status_code)
 
                     if response.status_code >= 400:
-                        print(response.reason)
-                        rm_f(path + ".json")
+                        print(f"something went wrong... {response.reason}")
                         if response.status_code == 401:
                             self.get_access_token()
-                            return
-                        return print("something went wrong...")
+                        return 
 
                     tmp = eval(str(response.json()))
                     if tmp == []:

@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
         show_progress()
 
-        connection.get_json_restricted(f"projects/{project_id}/slots")
+        connection.get_json_restricted(f"projects/{project_id}/slots", max_nb_page=20)
 
         with open(f"projects/{project_id}/slots.json") as json_slots :        
 
