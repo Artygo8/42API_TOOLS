@@ -121,6 +121,7 @@ class OAuth42:
                         rm_f(path + ".json")
                         if response.status_code == 401:
                             self.get_access_token()
+                            return
                         return print("something went wrong...")
 
                     tmp = eval(str(response.json()))
