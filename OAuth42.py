@@ -1,4 +1,4 @@
-import json, os, requests, datetime
+import json, os, requests
 from time import sleep
 
 def mkdir_p(folder):
@@ -85,13 +85,7 @@ class OAuth42:
             p.play()
             print("https://api.intra.42.fr/oauth/authorize?client_id=4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd&redirect_uri=http%3A%2F%2Fgoogle.com&response_type=code&scope=public%20projects") # no state for now.
             self.code = input("Paste the code from the url: ")
-            post_data = {
-                'grant_type' : "authorization_code",
-                'client_id' : self.client_id,
-                'client_secret' : self.client_secret,
-                'code' : self.code,
-                'redirect_uri' : "http://google.com"
-            }
+            post_data = {'grant_type' : "authorization_code",'client_id' : self.client_id,'client_secret' : self.client_secret,'code' : self.code,'redirect_uri' : "http://google.com"}
             r = requests.post(self.access_token_url, data=post_data)
             response = r.json()
             self.access_token = response["access_token"]
