@@ -27,8 +27,14 @@ def rm_f(path):
 class OAuth42:
 
         def __init__(self):
-            self.client_id = "4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd"
-            self.client_secret="61685f90ae7ec137cb916dd785cf3d7252dbfd13007d21ead5ff9c150d72f4d5"
+            if not os.path.isfile("credentials.json"):
+                print("\033[31mYou need a 'credentials.json' with your client_id and your client_secret accessible through the intranet. Contact the repository owner if you are lost.\033[m")
+                exit(1)
+            with open("credentials.json", "r") as creds:
+                json_cred = json.load(creds)
+                self.client_id = json_cred["client_id"]
+                self.client_secret = json_cred["client_secret"]
+                self.redirect_uri = json_cred["redirect_uri"]
             self.authorize_url = "https://api.intra.42.fr/oauth/authorize"
             self.access_token_url = "https://api.intra.42.fr/oauth/token"
             self.base_url = "https://api.intra.42.fr/v2"
@@ -98,9 +104,9 @@ class OAuth42:
                 p.play()
 
             sound_notif()
-            print("https://api.intra.42.fr/oauth/authorize?client_id=4c8b6090c10edd4d18bfe036d2ddaacffd63beb223edecdb761d7ebcf0ed7edd&redirect_uri=http%3A%2F%2Fgoogle.com&response_type=code&scope=public%20projects") # no state for now.
+            print(f"https://api.intra.42.fr/oauth/authorize?client_id={self.client_id}&redirect_uri={self.redirect_uri}&response_type=code&scope=public%20projects") # no state for now.
             self.code = input("Paste the code from the url: ")
-            post_data = {'grant_type' : "authorization_code",'client_id' : self.client_id,'client_secret' : self.client_secret,'code' : self.code,'redirect_uri' : "http://google.com"}
+            post_data = {'grant_type' : "authorization_code",'client_id' : self.client_id,'client_secret' : self.client_secret,'code' : self.code,'redirect_uri' : "https://www.google.com/"}
             response = requests.post(self.access_token_url, data=post_data)
             json_response = response.json()
             self.access_token = json_response["access_token"]
