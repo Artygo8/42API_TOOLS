@@ -40,6 +40,7 @@ class OAuth42:
             response = r.json()
             self.public_token = response["access_token"]
 
+
         def get_json_basic(self, path):
 
             if not self.public_token:
@@ -71,12 +72,12 @@ class OAuth42:
 
                 json.dump(content, json_file, indent=4)
 
-        #                _        _      _           _ 
-        #  _ __ ___  ___| |_ _ __(_) ___| |_ ___  __| |
-        # | '__/ _ \/ __| __| '__| |/ __| __/ _ \/ _` |
-        # | | |  __/\__ \ |_| |  | | (__| ||  __/ (_| |
-        # |_|  \___||___/\__|_|  |_|\___|\__\___|\__,_|
-        #                                              
+        #   __ _               
+        #  / _| | _____      __
+        # | |_| |/ _ \ \ /\ / /
+        # |  _| | (_) \ V  V / 
+        # |_| |_|\___/ \_/\_/  
+        #                      
 
         def get_access_token(self):
             import vlc
@@ -94,6 +95,7 @@ class OAuth42:
             r = requests.post(self.access_token_url, data=post_data)
             response = r.json()
             self.access_token = response["access_token"]
+
 
         def get_json_restricted(self, path):
 
@@ -131,51 +133,3 @@ class OAuth42:
                     content.extend(tmp)
 
                 json.dump(content, json_file, indent=4)
-
-        #                 _                  
-        #   ___ _   _ ___| |_ ___  _ __ ___  
-        #  / __| | | / __| __/ _ \| '_ ` _ \ 
-        # | (__| |_| \__ \ || (_) | | | | | |
-        #  \___|\__,_|___/\__\___/|_| |_| |_|
-        #                                   
-
-        # I find the slots but still can't book them.
-        def find_slots(self, project_id):
-            import vlc
-            import random
-
-            print("\033[33mBe aware that this script will not work well the first 5 minutes, it needs to build up some data first.\033[m")
-
-            if not self.access_token:
-                self.get_access_token()
-
-            discovered_slots = set()
-            while (1):
-
-                self.get_json_restricted(f"projects/{project_id}/slots")
-
-                # protection against file deletion that might be caused by server overload
-                if not os.path.isfile(f"projects/{project_id}/slots.json"):
-                    continue
-
-                print('.', end='', flush=True) # to show progress
-                with open(f"projects/{project_id}/slots.json") as json_slots :
-                    data = json.load(json_slots)
-                    newly_discovered_slots = set()
-                    for slot in data:
-                        slot_id = slot["id"]
-                        if slot_id in discovered_slots:
-                            continue
-
-                        date = datetime.datetime.strptime(slot["begin_at"], '%Y-%m-%dT%H:%M:%S.000Z')
-                        # I think that when slots are created, their id is greater than the previous slots.
-                        if date.day in [date.today().day, date.today().day + 1] and all(slot_id > ds for ds in discovered_slots) and (date - datetime.datetime.now()).total_seconds() / 3600 > 0.5:
-                            p = vlc.MediaPlayer("notif.mp3")
-                            p.play()
-                            newly_discovered_slots.add(slot_id)
-                            print(f"\033[36m\rNew slot for {date.ctime()} discovered at {date.today().hour}h{date.today().minute:02}\033[m")
-
-                    discovered_slots.update(newly_discovered_slots)
-
-                # sleep is random for multi users
-                sleep (random.randint(30, 40))
