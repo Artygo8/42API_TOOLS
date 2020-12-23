@@ -52,9 +52,15 @@ if __name__ == "__main__":
 
         connection.get_json_restricted(f"projects/{project_id}/slots", max_nb_page=20)
 
+        if not os.path.isfile(f"projects/{project_id}/slots.json"): continue
+
         with open(f"projects/{project_id}/slots.json") as json_slots :        
 
             newly_discovered_slots = set()
+
+            if not json_slots:
+                print("Can't find any slot :(")
+                continue
 
             for slot in json.load(json_slots):
             

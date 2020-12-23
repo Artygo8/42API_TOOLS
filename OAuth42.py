@@ -27,9 +27,6 @@ def rm_f(path):
 class OAuth42:
 
         def __init__(self):
-            if not os.path.isfile("credentials.json"):
-                print("\033[31mYou need a 'credentials.json' with your client_id and your client_secret accessible through the intranet. Contact the repository owner if you are lost.\033[m")
-                exit(1)
             with open("credentials.json") as creds:
                 json_cred = json.load(creds)
                 self.client_id = json_cred["client_id"]
