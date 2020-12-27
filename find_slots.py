@@ -16,8 +16,9 @@ def print_warning(str):
     print(f"\033[33m{str}\033[m")
 
 def sound_notif():
-    p = vlc.MediaPlayer("notif.mp3")
-    p.play()
+    # p = vlc.MediaPlayer("notif.mp3")
+    # p.play()
+    pass
 
 def show_new_slot(date):
     print(f"\033[36m\rNew slot for {date.ctime()} discovered at {date.today().hour}h{date.today().minute:02}\033[m")
