@@ -112,8 +112,8 @@ class OAuth42:
             if self.refresh_token:
                 self.refresh_access_token()
                 return
-            # p = vlc.MediaPlayer("notif.mp3")
-            # p.play()
+            p = vlc.MediaPlayer("notif.mp3")
+            p.play()
             print(f"https://api.intra.42.fr/oauth/authorize?client_id={self.client_id}&redirect_uri={self.redirect_uri}&response_type=code&scope=public%20projects") # no state for now.
             self.code = input("Paste the code from the url: ")
             post_data = {
