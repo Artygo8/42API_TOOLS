@@ -77,7 +77,8 @@ class OAuth42:
 
                     if response.status_code >= 400:
                         print(f"something went wrong... {response.reason}")
-                        return 
+                        rm_f(path + ".json")
+                        return
 
                     tmp = eval(str(response.json()))
                     if tmp == []:
@@ -149,6 +150,7 @@ class OAuth42:
 
                     if response.status_code >= 400:
                         print(f"something went wrong... {response.reason}")
+                        rm_f(path + ".json")
                         if response.status_code == 401:
                             self.get_access_token()
                         break
