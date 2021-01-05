@@ -55,7 +55,10 @@ class OAuth42:
             }
             response = requests.post(self.access_token_url, data=post_data)
             json_response = response.json()
-            self.public_token = json_response["access_token"]
+            try:
+                self.public_token = json_response["access_token"]
+            except:
+                exit("cannot get basic access")
 
 
         def get_json_basic(self, path, max_nb_page=1000, basedir="./", show_status_code=False):
@@ -76,8 +79,8 @@ class OAuth42:
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.public_token}"})
 
                     if response.status_code >= 400:
-                        print(f"something went wrong... {response.reason}")
                         rm_f(path + ".json")
+                        exit(f"something went wrong... {response.reason} {response.status_code}")
                         return
 
                     tmp = eval(str(response.json()))
@@ -105,7 +108,10 @@ class OAuth42:
             response = requests.post(self.access_token_url, data=post_data)
             print(f"response = ({response.status_code}) {response.content}")
             json_response = response.json()
-            self.access_token = json_response["access_token"]
+            try:
+                self.access_token = json_response["access_token"]
+            except:
+                exit("cannot refresh access token")
             return self.access_token
 
         def get_access_token(self):
@@ -127,8 +133,11 @@ class OAuth42:
             response = requests.post(self.access_token_url, data=post_data)
             print(f"response = ({response.status_code}) {response.content}")
             json_response = response.json()
-            self.access_token = json_response["access_token"]
-            self.refresh_token = json_response["refresh_token"]
+            try:
+                self.access_token = json_response["access_token"]
+                self.refresh_token = json_response["refresh_token"]
+            except:
+                exit("cannot retrieve access token")
             return self.access_token
 
         def get_json_restricted(self, path, max_nb_page=1000, basedir="./", show_status_code=False):
@@ -149,11 +158,11 @@ class OAuth42:
                     if show_status_code: print("status:", response.status_code)
 
                     if response.status_code >= 400:
-                        print(f"something went wrong... {response.reason}")
                         rm_f(path + ".json")
                         if response.status_code == 401:
                             self.get_access_token()
-                        break
+                            break
+                        exit(f"something went wrong... {response.reason} {response.status_code}")
 
                     tmp = eval(str(response.json()))
                     if tmp == []:

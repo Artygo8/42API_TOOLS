@@ -14,6 +14,7 @@ if USER == "": USER = input("What is your username? ")
 if not os.path.isfile(f"campus.json"):
     connection.get_json_basic("campus")
 
+campus_id = 0
 with open("campus.json") as campus_json:
     for campus in json.load(campus_json):
         if campus["name"].upper() == CAMPUS.upper():
@@ -27,6 +28,8 @@ print("campus_id is", campus_id)
 if not os.path.isfile(f"campus/{campus_id}/users.json"):
     connection.get_json_basic(f"campus/{campus_id}/users")
 
+
+user_id = 0
 with open(f"campus/{campus_id}/users.json") as campus_users_json:
     for users in json.load(campus_users_json):
         if users["login"].upper() == USER.upper():
@@ -34,11 +37,15 @@ with open(f"campus/{campus_id}/users.json") as campus_users_json:
             break
 
 print("user_id is", user_id)
-
+# if not user_id:
+#     exit("user_id not found")
 
 # RETRIEVE GUIDELINES
 if not os.path.isfile(f"users/{user_id}/scale_teams.json"):
     connection.get_json_basic(f"users/{user_id}/scale_teams")
+
+# if not os.path.isfile(f"users/{user_id}/scale_teams.json"):
+#     exit()
 
 BASEDIR="guidelines/"
 
