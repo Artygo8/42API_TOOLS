@@ -16,10 +16,18 @@ else
 	echo -e "\033[32mrequests is installed\033[m"
 fi
 
-python3 -c "import vlc"
+# python3 -c "import vlc"
+# if [ $? -ne 0 ]; then
+# 	echo -e "\033[35minstalling vlc\033[m"
+# 	python3 -m pip install python-vlc
+# else
+# 	echo -e "\033[32mvlc is installed\033[m"
+# fi
+
+python3 -c "import chime"
 if [ $? -ne 0 ]; then
-	echo -e "\033[35minstalling vlc\033[m"
-	python3 -m pip install python-vlc
+	echo -e "\033[35minstalling chime\033[m"
+	python3 -m pip install chime
 else
-	echo -e "\033[32mvlc is installed\033[m"
+	echo -e "\033[32mchime is installed\033[m"
 fi

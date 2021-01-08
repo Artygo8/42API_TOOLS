@@ -1,6 +1,6 @@
 from OAuth42 import OAuth42
 from time import sleep
-import vlc, random, json, datetime, os
+import random, json, datetime, os, chime
 
 #        _   _ _     
 #  _   _| |_(_) |___ 
@@ -16,8 +16,8 @@ def print_warning(str):
     print(f"\033[33m{str}\033[m")
 
 def sound_notif():
-    p = vlc.MediaPlayer("notif.mp3")
-    p.play()
+    chime.theme('mario')
+    chime.info()
 
 def show_new_slot(date):
     print(f"\033[36m\rNew slot for {date.ctime()} discovered at {date.today().hour}h{date.today().minute:02}\033[m")

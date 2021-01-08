@@ -1,4 +1,4 @@
-import json, os, requests, vlc
+import json, os, requests, chime
 from time import sleep
 
 #  _              _     
@@ -27,6 +27,7 @@ def rm_f(path):
 class OAuth42:
 
         def __init__(self):
+            chime.theme('mario')
             with open("credentials.json") as creds:
                 json_cred = json.load(creds)
                 self.client_id = json_cred["client_id"]
@@ -58,6 +59,7 @@ class OAuth42:
             try:
                 self.public_token = json_response["access_token"]
             except:
+                chime.error()
                 exit("cannot get basic access")
 
 
@@ -74,12 +76,15 @@ class OAuth42:
                 content = []
                 for page_number in range(0, max_nb_page):
             
+                    print("page_number", page_number)
+
                     sleep(0.6) # Please dont sleep less than 0.5 for the server limit.
 
-                    response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.public_token}"})
+                    response = requests.get(f'{self.base_url}/{path}?page={page_number}', headers = {"Authorization": f"Bearer {self.public_token}"})
 
                     if response.status_code >= 400:
                         rm_f(path + ".json")
+                        chime.error()
                         exit(f"something went wrong... {response.reason} {response.status_code}")
                         return
 
@@ -111,6 +116,7 @@ class OAuth42:
             try:
                 self.access_token = json_response["access_token"]
             except:
+                chime.error()
                 exit("cannot refresh access token")
             return self.access_token
 
@@ -119,8 +125,7 @@ class OAuth42:
             if self.refresh_token:
                 self.refresh_access_token()
                 return
-            p = vlc.MediaPlayer("notif.mp3")
-            p.play()
+            chime.success()
             print(f"https://api.intra.42.fr/oauth/authorize?client_id={self.client_id}&redirect_uri={self.redirect_uri}&response_type=code&scope=public%20projects") # no state for now.
             self.code = input("Paste the code from the url: ")
             post_data = {
@@ -137,6 +142,7 @@ class OAuth42:
                 self.access_token = json_response["access_token"]
                 self.refresh_token = json_response["refresh_token"]
             except:
+                chime.error()
                 exit("cannot retrieve access token")
             return self.access_token
 
@@ -150,7 +156,7 @@ class OAuth42:
 
                 content = []
                 for page_number in range(0, max_nb_page):
-            
+
                     sleep(1) # Please dont sleep less than 0.5 for the server limit, I use 1 so we can have more than one user at the time. + it shouldnt be more than 2 pages anyway
 
                     response = requests.get(f'{self.base_url}/{path}?page[number]={page_number}', headers = {"Authorization": f"Bearer {self.access_token}"})
@@ -162,6 +168,7 @@ class OAuth42:
                         if response.status_code == 401:
                             self.get_access_token()
                             break
+                        chime.error()
                         exit(f"something went wrong... {response.reason} {response.status_code}")
 
                     tmp = eval(str(response.json()))
